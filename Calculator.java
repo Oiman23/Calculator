@@ -2,12 +2,12 @@ package GUIProgramming;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
-public class Calculator { // organize numbers, read other comments on numbers, maybe borderLayout a and
-							// move panel left to right.
+public class Calculator {
 	JFrame frame;
 	Button buttonPeriod;
 	Button buttonPlus;
@@ -15,10 +15,11 @@ public class Calculator { // organize numbers, read other comments on numbers, m
 	Button buttonMult;
 	Button buttonDiv;
 	Button buttonEqual;
-	int answer;
-	int numberHolder;
-	int decimalDigit;
-	boolean decimal;
+	String answerString = "0";
+	String holderString = "0";
+	BigDecimal answerNumber;
+	BigDecimal holderNumber;
+	MathContext mc = new MathContext(10);
 	char sign;
 
 	public Calculator() {
@@ -27,7 +28,7 @@ public class Calculator { // organize numbers, read other comments on numbers, m
 		frame.setTitle("Calculator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
-		frame.setSize(370, 500);
+		frame.setSize(400, 600);
 		frame.getContentPane().setBackground(Color.LIGHT_GRAY);
 		frame.setResizable(false);
 
@@ -38,20 +39,21 @@ public class Calculator { // organize numbers, read other comments on numbers, m
 
 		// Answer Text
 		JLabel answerText = new JLabel();
-		answerText.setText(Integer.toString(answer));
+		answerText.setText(answerString);
 		answerText.setOpaque(true);
-		answerText.setBounds(0, 0, 30, 30);
-		Border BevelRaised = BorderFactory.createBevelBorder(BevelBorder.RAISED);
-		answerText.setBorder(BevelRaised);
+		answerText.setBounds(0, 0, 40, 40);
+		answerText.setFont(new Font("Ariel", Font.PLAIN, 20));
 		textPanel.add(answerText, BorderLayout.CENTER);
 
 		// Clear Button
 		Button clearButton = new Button("Clear");
+		changeFont(clearButton);
 		clearButton.addActionListener((ActionEvent e) -> {
 			resetHolderLabel();
-			answer = 0;
+			answerString = "0";
+			answerNumber = new BigDecimal(answerString);
 			sign = 'x';
-			updateAnswerText(answerText, numberHolder);
+			updateAnswerText(answerText, holderString);
 		});
 		textPanel.add(clearButton, BorderLayout.SOUTH);
 
@@ -60,98 +62,155 @@ public class Calculator { // organize numbers, read other comments on numbers, m
 		panel.setBackground(Color.LIGHT_GRAY);
 		frame.add(panel);
 
-		// Numbered Buttons
-		for (int i = 0; i < 10; i++) {
+		// 1-3 buttons
+		for (int i = 1; i < 4; i++) {
 			Button buttonNumber = new Button(Integer.toString(i));
+			changeFont(buttonNumber);
 			panel.add(buttonNumber);
 			buttonNumber.addActionListener((ActionEvent e) -> {
-				String Strtemp = buttonNumber.getLabel();
-				int current = Integer.parseInt(Strtemp);
-				numberHolder *= 10;
-				numberHolder += current;
-				updateAnswerText(answerText, numberHolder);
+				if (holderString.equals("0")) {
+					holderString = buttonNumber.getLabel();
+				} else {
+					holderString += buttonNumber.getLabel();
+				}
+				updateAnswerText(answerText, holderString);
 			});
 		}
-		// Decimal Button
-		buttonPeriod = new Button(".");
-		buttonPeriod.addActionListener((ActionEvent e) -> {
-			decimal = true;
-		});
 
-		// Sign Buttons
+		// + button
 		buttonPlus = new Button("+");
+		changeFont(buttonPlus);
 		buttonPlus.addActionListener((ActionEvent e) -> {
 			updateMath('+');
-			updateAnswerText(answerText, answer);
+			updateAnswerText(answerText, answerString);
 		});
+		panel.add(buttonPlus);
+
+		// 4-6 buttons
+		for (int i = 4; i < 7; i++) {
+			Button buttonNumber = new Button(Integer.toString(i));
+			changeFont(buttonNumber);
+			panel.add(buttonNumber);
+			buttonNumber.addActionListener((ActionEvent e) -> {
+				if (holderString.equals("0")) {
+					holderString = buttonNumber.getLabel();
+				} else {
+					holderString += buttonNumber.getLabel();
+				}
+				updateAnswerText(answerText, holderString);
+			});
+		}
+
+		// Sub button
 		buttonSub = new Button("-");
+		changeFont(buttonSub);
 		buttonSub.addActionListener((ActionEvent e) -> {
 			updateMath('-');
-			updateAnswerText(answerText, answer);
-
+			updateAnswerText(answerText, answerString);
 		});
+		panel.add(buttonSub);
+
+		// 7-9 buttons
+		for (int i = 7; i < 10; i++) {
+			Button buttonNumber = new Button(Integer.toString(i));
+			changeFont(buttonNumber);
+			panel.add(buttonNumber);
+			buttonNumber.addActionListener((ActionEvent e) -> {
+				if (holderString.equals("0")) {
+					holderString = buttonNumber.getLabel();
+				} else {
+					holderString += buttonNumber.getLabel();
+				}
+				updateAnswerText(answerText, holderString);
+			});
+		}
+
+		// Decimal Button
+		buttonPeriod = new Button(".");
+		changeFont(buttonPeriod);
+		buttonPeriod.addActionListener((ActionEvent e) -> {
+			holderString += ".";
+		});
+		Button buttonZero = new Button(Integer.toString(0));
+		changeFont(buttonZero);
+		panel.add(buttonZero);
+		buttonZero.addActionListener((ActionEvent e) -> {
+			if (holderString.equals("0")) {
+				holderString = buttonZero.getLabel();
+			} else {
+				holderString += buttonZero.getLabel();
+			}
+			updateAnswerText(answerText, holderString);
+		});
+		panel.add(buttonPeriod);
+
+		// * button
 		buttonMult = new Button("*");
+		changeFont(buttonMult);
 		buttonMult.addActionListener((ActionEvent e) -> {
 			updateMath('*');
-			updateAnswerText(answerText, answer);
+			updateAnswerText(answerText, answerString);
 		});
+
+		// '/' button
 		buttonDiv = new Button("/");
+		changeFont(buttonDiv);
 		buttonDiv.addActionListener((ActionEvent e) -> {
 			updateMath('/');
-			updateAnswerText(answerText, answer);
-
+			updateAnswerText(answerText, answerString);
 		});
+
+		// = button
 		buttonEqual = new Button("=");
+		changeFont(buttonDiv);
 		buttonEqual.addActionListener((ActionEvent e) -> {
-			System.out.println("answer " + answer);
-			System.out.println("NumberHolder " + numberHolder);
-			System.out.println("Sign: " + sign);
 			updateMath('x');
-			System.out.println("= " + answer);
-			updateAnswerText(answerText, answer);
+			updateAnswerText(answerText, answerString);
 		});
 
-		panel.add(buttonPeriod);
-		panel.add(buttonPlus);
-		panel.add(buttonSub);
 		panel.add(buttonMult);
 		panel.add(buttonDiv);
 		panel.add(buttonEqual);
-
-//		frame.pack();
 		frame.add(textPanel, BorderLayout.NORTH);
 		frame.setVisible(true);
+	}
 
+	private void changeFont(Button button) {
+		button.setFont(new Font("Arial", Font.PLAIN, 20));
 	}
 
 	private void updateMath(char signT) {
-
-		System.out.println("Hold " + sign);
-		if (answer == 0) {
-			answer = numberHolder;
+		answerNumber = new BigDecimal(answerString);
+		holderNumber = new BigDecimal(holderString);
+		if (answerNumber.toString().equals("0")) {
+			answerNumber = holderNumber;
 		}
-		if (sign == '+') { // add longer addition result (Another int before it, add hte carry bit to LSB
-							// of second number )
-			answer += numberHolder;
-		} else if (sign == '-') { // add longer subtraction
-			answer -= numberHolder;
-		} else if (sign == '*') { // add longer multiple signs, make compatible with decimals
-			answer *= numberHolder;
-		} else if (sign == '/' && numberHolder != 0) { // add decimals, make compatible with decimals
-			answer /= numberHolder;
+		if (sign == '+') {
+			answerNumber = answerNumber.add(holderNumber, mc);
+		} else if (sign == '-') {
+			answerNumber = answerNumber.subtract(holderNumber, mc);
+		} else if (sign == '*') {
+			answerNumber = answerNumber.multiply(holderNumber, mc);
+		} else if (sign == '/') {
+			try {
+				answerNumber = answerNumber.divide(holderNumber, mc);
+			} catch (ArithmeticException e1) {
+				answerNumber = holderNumber.add(holderNumber, mc);
+				;
+			}
 		}
+		answerString = answerNumber.toPlainString();
 		sign = signT;
 		resetHolderLabel();
 	}
 
-	private void updateAnswerText(JLabel answerLabel, int label) {
-		answerLabel.setText(Integer.toString(label));
+	private void updateAnswerText(JLabel answerLabel, String label) {
+		answerLabel.setText(label);
 	}
 
 	private void resetHolderLabel() {
-		numberHolder = 0;
-		decimal = false;
-		decimalDigit = 0;
+		holderString = "0";
+		holderNumber = new BigDecimal(holderString);
 	}
 
 	public static void main(String args[]) {
